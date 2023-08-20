@@ -27,6 +27,10 @@ func TestBehaviourMatchesWc(t *testing.T) {
 			Name: "word count",
 			Args: []string{"-w", testFile},
 		},
+		{
+			Name: "character count",
+			Args: []string{"-m", testFile},
+		},
 	}
 	for _, testCase := range testCases {
 		wc := exec.Command("wc", testCase.Args...)

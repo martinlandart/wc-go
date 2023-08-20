@@ -22,6 +22,9 @@ func main() {
 	var wordCountFlag bool
 	flag.BoolVar(&wordCountFlag, "w", false, "print the word counts")
 
+	var charCountFlag bool
+	flag.BoolVar(&charCountFlag, "m", false, "print the character counts")
+
 	flag.Parse()
 
 	if byteCountFlag {
@@ -33,8 +36,21 @@ func main() {
 	if wordCountFlag {
 		_ = HandleCommand(os.Stdout, filename, WordCount)
 	}
+	if charCountFlag {
+		_ = HandleCommand(os.Stdout, filename, CharCount)
+	}
 
 	fmt.Println(filename)
+}
+
+func CharCount(file []byte) (int, error) {
+	str := string(file)
+	counter := 0
+	strings.FieldsFunc(str, func(r rune) bool {
+		counter++
+		return false
+	})
+	return counter, nil
 }
 
 func WordCount(file []byte) (int, error) {
