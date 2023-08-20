@@ -27,17 +27,17 @@ func TestBehaviourMatchesWc(t *testing.T) {
 	for _, testCase := range testCases {
 		wc := exec.Command("wc", testCase.Args...)
 		gowc := exec.Command("./gowc", testCase.Args...)
-		AssertEqualCommandOutput(t, gowc, wc)
+		AssertEqualCommandOutput(t, testCase.Name, gowc, wc)
 	}
 }
 
-func AssertEqualCommandOutput(t *testing.T, command *exec.Cmd, target *exec.Cmd) {
+func AssertEqualCommandOutput(t *testing.T, testName string, command *exec.Cmd, target *exec.Cmd) {
 	t.Helper()
 	execute := func(out io.Writer, cmd *exec.Cmd) error {
 		cmd.Stdout = out
 		err := cmd.Run()
 		if err != nil {
-			t.Fatalf("gowc unexpected error %q", err)
+			t.Fatalf("%s: gowc unexpected error %q", testName, err)
 		}
 		return nil
 	}
@@ -50,7 +50,7 @@ func AssertEqualCommandOutput(t *testing.T, command *exec.Cmd, target *exec.Cmd)
 	RequireNoErr(t, err)
 
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("got '%s' want '%s'", got.Bytes(), want.Bytes())
+		t.Fatalf("%s: got '%s' want '%s'", testName, got.Bytes(), want.Bytes())
 	}
 }
 
@@ -58,16 +58,5 @@ func RequireNoErr(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("unexpected error %q", err)
-	}
-}
-
-func TestByteCount(t *testing.T) {
-	want := uint(335191)
-	got, err := ByteCount(testFile)
-	if err != nil {
-		t.Fatalf("unexpected error %q", err)
-	}
-	if got != want {
-		t.Fatalf("got %v want %v", got, want)
 	}
 }
