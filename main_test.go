@@ -2,31 +2,34 @@ package main
 
 import (
 	"bytes"
+	"os/exec"
 	"reflect"
 	"testing"
 )
 
-// func TestByteCount(t *testing.T) {
-// 	wc := exec.Command("wc", "-c", "test.txt")
-// 	var wcout bytes.Buffer
-// 	wc.Stdout = &wcout
-// 	err := wc.Run()
-// 	if err != nil {
-// 		t.Fatalf("wc unexpected error %q", err)
-// 	}
-//
-// 	var goWcOut bytes.Buffer
-// 	os.Args = []string{"-c", "test.txt"}
-// 	err = GoWc(&goWcOut)
-// 	if err != nil {
-// 		t.Fatalf("gowc unexpected error %q", err)
-// 	}
-// 	got := goWcOut.Bytes()
-// 	want := wcout.Bytes()
-// 	if !reflect.DeepEqual(got, want) {
-// 		t.Fatalf("got %q want %q", got, want)
-// 	}
-// }
+func TestCmdByteCount(t *testing.T) {
+	wc := exec.Command("wc", "-c", "test.txt")
+	var wcout bytes.Buffer
+	wc.Stdout = &wcout
+	err := wc.Run()
+	if err != nil {
+		t.Fatalf("wc unexpected error %q", err)
+	}
+
+	gowc := exec.Command("./gowc", "-c", "test.txt")
+	var goWcOut bytes.Buffer
+	gowc.Stdout = &goWcOut
+	err = gowc.Run()
+	if err != nil {
+		t.Fatalf("gowc unexpected error %q", err)
+	}
+
+	got := goWcOut.Bytes()
+	want := wcout.Bytes()
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
 
 var testFile string = "test.txt"
 

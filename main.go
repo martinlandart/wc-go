@@ -7,11 +7,22 @@ import (
 )
 
 func main() {
+	args := os.Args[1:]
+	filename := args[len(args)-1]
+	HandleGetByteCountCommand(os.Stdout, filename)
+
 }
 
 func HandleGetByteCountCommand(w io.Writer, filename string) error {
-	bc, _ := ByteCount(filename)
-	fmt.Fprintf(w, "%v %s\n", bc, filename)
+	bc, err := ByteCount(filename)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(w, "%v %s\n", bc, filename)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
