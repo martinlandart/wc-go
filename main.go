@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -18,16 +19,29 @@ func main() {
 	var lineCountFlag bool
 	flag.BoolVar(&lineCountFlag, "l", false, "print the newline counts")
 
+	var wordCountFlag bool
+	flag.BoolVar(&wordCountFlag, "w", false, "print the word counts")
+
 	flag.Parse()
 
 	if byteCountFlag {
-		HandleCommand(os.Stdout, filename, ByteCount)
+		_ = HandleCommand(os.Stdout, filename, ByteCount)
 	}
 	if lineCountFlag {
-		HandleCommand(os.Stdout, filename, LineCount)
+		_ = HandleCommand(os.Stdout, filename, LineCount)
+	}
+	if wordCountFlag {
+		_ = HandleCommand(os.Stdout, filename, WordCount)
 	}
 
 	fmt.Println(filename)
+}
+
+func WordCount(file []byte) (int, error) {
+	words := strings.FieldsFunc(string(file), func(r rune) bool {
+		return unicode.IsSpace(r)
+	})
+	return len(words), nil
 }
 
 func LineCount(file []byte) (int, error) {
