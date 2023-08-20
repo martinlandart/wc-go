@@ -2,36 +2,60 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"os/exec"
 	"reflect"
 	"testing"
 )
 
-func TestCmdByteCount(t *testing.T) {
-	wc := exec.Command("wc", "-c", "test.txt")
-	var wcout bytes.Buffer
-	wc.Stdout = &wcout
-	err := wc.Run()
-	if err != nil {
-		t.Fatalf("wc unexpected error %q", err)
-	}
+var testFile string = "test.txt"
 
-	gowc := exec.Command("./gowc", "-c", "test.txt")
-	var goWcOut bytes.Buffer
-	gowc.Stdout = &goWcOut
-	err = gowc.Run()
-	if err != nil {
-		t.Fatalf("gowc unexpected error %q", err)
+func TestBehaviourMatchesWc(t *testing.T) {
+	testCases := []struct {
+		Name string
+		Args []string
+	}{
+		{
+			Name: "byte count",
+			Args: []string{"-c", testFile},
+		},
 	}
+	for _, testCase := range testCases {
+		wc := exec.Command("wc", testCase.Args...)
+		gowc := exec.Command("./gowc", testCase.Args...)
+		AssertEqualCommandOutput(t, gowc, wc)
+	}
+}
 
-	got := goWcOut.Bytes()
-	want := wcout.Bytes()
+func AssertEqualCommandOutput(t *testing.T, command *exec.Cmd, target *exec.Cmd) {
+	t.Helper()
+	execute := func(out io.Writer, cmd *exec.Cmd) error {
+		cmd.Stdout = out
+		err := cmd.Run()
+		if err != nil {
+			t.Fatalf("gowc unexpected error %q", err)
+		}
+		return nil
+	}
+	var got bytes.Buffer
+	var want bytes.Buffer
+
+	err := execute(&got, command)
+	RequireNoErr(t, err)
+	err = execute(&want, target)
+	RequireNoErr(t, err)
+
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %q want %q", got, want)
 	}
 }
 
-var testFile string = "test.txt"
+func RequireNoErr(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("unexpected error %q", err)
+	}
+}
 
 func TestHandleGetByteCountCommand(t *testing.T) {
 	var got bytes.Buffer
