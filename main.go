@@ -27,7 +27,8 @@ func main() {
 
 	flag.Parse()
 
-	if !byteCountFlag && !lineCountFlag && !wordCountFlag && !charCountFlag {
+	noFlags := !byteCountFlag && !lineCountFlag && !wordCountFlag && !charCountFlag
+	if noFlags {
 		// for some reason, wc by default prints odd white spacing
 		// probably due to using a borked format string
 		fmt.Print("  ")
