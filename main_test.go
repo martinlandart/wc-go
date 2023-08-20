@@ -19,6 +19,10 @@ func TestBehaviourMatchesWc(t *testing.T) {
 			Name: "byte count",
 			Args: []string{"-c", testFile},
 		},
+		{
+			Name: "line count",
+			Args: []string{"-l", testFile},
+		},
 	}
 	for _, testCase := range testCases {
 		wc := exec.Command("wc", testCase.Args...)
@@ -46,7 +50,7 @@ func AssertEqualCommandOutput(t *testing.T, command *exec.Cmd, target *exec.Cmd)
 	RequireNoErr(t, err)
 
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("got %q want %q", got, want)
+		t.Fatalf("got '%s' want '%s'", got.Bytes(), want.Bytes())
 	}
 }
 
@@ -54,19 +58,6 @@ func RequireNoErr(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("unexpected error %q", err)
-	}
-}
-
-func TestHandleGetByteCountCommand(t *testing.T) {
-	var got bytes.Buffer
-	err := HandleGetByteCountCommand(&got, testFile)
-	if err != nil {
-		t.Fatalf("unexpected error %q", err)
-	}
-
-	want := bytes.NewBufferString("335191 test.txt\n")
-	if !reflect.DeepEqual(got, *want) {
-		t.Fatalf("got %s want %s", got.Bytes(), want.Bytes())
 	}
 }
 
