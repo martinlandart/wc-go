@@ -27,6 +27,16 @@ func main() {
 
 	flag.Parse()
 
+	if !byteCountFlag && !lineCountFlag && !wordCountFlag && !charCountFlag {
+		// for some reason, wc by default prints odd white spacing
+		// probably due to using a borked format string
+		fmt.Print("  ")
+		_ = HandleCommand(os.Stdout, filename, LineCount)
+		fmt.Print(" ")
+		_ = HandleCommand(os.Stdout, filename, WordCount)
+		_ = HandleCommand(os.Stdout, filename, ByteCount)
+	}
+
 	if byteCountFlag {
 		_ = HandleCommand(os.Stdout, filename, ByteCount)
 	}

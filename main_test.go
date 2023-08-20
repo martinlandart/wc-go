@@ -31,6 +31,10 @@ func TestBehaviourMatchesWc(t *testing.T) {
 			Name: "character count",
 			Args: []string{"-m", testFile},
 		},
+		{
+			Name: "default mode (-c -l -w)",
+			Args: []string{testFile},
+		},
 	}
 	for _, testCase := range testCases {
 		wc := exec.Command("wc", testCase.Args...)
